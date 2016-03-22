@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Map {
 
-	/** N�zev vstupn�ho souboru pro souradnice okres� **/
+	/** Vstupní soubor **/
 	private final String vstupniSouborOkresu = "data/kraje_cr.txt";
 	
 	/** N�zev vstupn�ho souboru pro statistiky**/
@@ -50,6 +50,9 @@ public class Map {
 	
 	/** Minimum mapy **/
 	Point2D.Double min;
+	
+	/** Magická konstanta pro sirku CR **/
+	public static final double MAGIC_CONSTANT = 1.3;
 
 
 	/**
@@ -76,6 +79,7 @@ public class Map {
 			if (okres.mapRegion.getMax().y > max.y) max.y = okres.mapRegion.getMax().y;
 		}
 		
+		//slouzi pro vypocitavani pomeru podle toho jak se ma roztahovat okno
 		widthMap = Math.abs(Math.abs(max.x) - Math.abs(min.x));
 		heightMap = Math.abs(Math.abs(max.y) - Math.abs(min.y));
 		
@@ -84,7 +88,7 @@ public class Map {
 			pomer = widthVykres/widthMap;
 		else
 			pomer = heightVykres/heightMap;
-		
+	
 		///nacteni barev atd...
 		//this.readPOP_WRK_CRM(vstupniPOP_WRK_CRM);
 		
@@ -96,6 +100,25 @@ public class Map {
 			POPCelkem.add(new Data(i, celkem));
 		}
 				
+	}
+	
+	/**
+	 * Slouzi pro otoceni vstupnich dat o -90°
+	 * @param pointX
+	 * @param pointY
+	 * @return
+	 */
+	public Point2D.Double rotationPoint(double pointX, double pointY){
+		double angle = -90 * Math.PI / 180;
+	    double cos = Math.cos(angle);
+	    double sin = Math.sin(angle);
+	    double dx = pointX - 63.116994844800004;
+	    double dy = pointY - 12.091104331;
+	    double x = cos * dx - sin * dy + 63.116994844800004;
+	    double y = sin * dx + cos * dy + 63.116994844800004;
+	    
+	    Point2D.Double rotated = new Point2D.Double(x, y);
+		return rotated;	
 	}
 	
 	/**
@@ -119,9 +142,9 @@ public class Map {
 					lineWithPoints = lineWithPoints.substring(1, lineWithPoints.length() - 1);
 					String pointsString[] = lineWithPoints.split("\\),\\(");
 					Point2D.Double points[] = new Point2D.Double[pointsString.length];				
-					for (int i = 0; i < points.length; i++) {
+					for (int i = 0; i < points.length; i++) { //nebo tady otocit kazdy bod o 90° (mapRegion.getMin()
 						String singlePoint[] = pointsString[i].split(",");
-						points[i] = new Point2D.Double(Double.parseDouble(singlePoint[0]),Double.parseDouble(singlePoint[1])*-1);
+						points[i] = rotationPoint(Double.parseDouble(singlePoint[0])*MAGIC_CONSTANT,Double.parseDouble(singlePoint[1]));
 					}
 					
 					this.regions.add(
@@ -334,18 +357,22 @@ public class Map {
 	/**
 	 * Vr�t� n�zev m�sta pokud bude na n�j kliknut, jinak vr�t� hodnotu Plze�-m�sto
 	 * @param point sou�adnice kliknut� my�i
-	 * @return n�zev m�sta
+	 * @return název města
 	 */
 	public String isInArea(Point point)
 	{
 		String vyberMesta = "";
-		for (Okres okres : regions) {
-			vyberMesta = okres.isInArea(point);
-			
-			if(vyberMesta != "")
-				return vyberMesta;
-		}
-		
+		//TODO pokud okres == PRH tak konkroluj 1. protoze jinak to najde stredocesky kraj
+		if("PRH".contentEquals(regions.get(12).isInArea(point))){
+			return "PRH";
+		}else{
+			for (Okres okres : regions) {
+				vyberMesta = okres.isInArea(point);
+				
+				if(vyberMesta != "")
+					return vyberMesta;
+			}
+		}	
 		return "PM";
 	}
 	

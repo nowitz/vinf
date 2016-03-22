@@ -137,7 +137,6 @@ public class MapRegion {
 		double labelHeight = labelLayout.getAscent() + labelLayout.getDescent();
 		Area k = new Area(this.regionPath);
 		Rectangle2D.Double r = new Rectangle2D.Double(centroidTransformed.x,centroidTransformed.y - labelHeight,labelLayout.getBounds().getWidth(), labelLayout.getBounds().getHeight());
-
 	//	g2.setColor(Color.BLACK);
 		if (!k.contains(r)) {
 			

@@ -80,7 +80,9 @@ public class Grawing extends JPanel{
 				Point pointer = new Point(
 						(int)(posunX + e.getPoint().getX()),
 						(int)(posunY + e.getPoint().getY()));
-					
+				
+				
+				//TODO otocit bod o 90° po kruznici
 				String vyber = mapa.isInArea(pointer);
 				
 				if(!vyberMesta.equals(vyber))
@@ -268,16 +270,26 @@ public class Grawing extends JPanel{
 		
 		AffineTransform puvodniTR = g2.getTransform();
 		
+		//vykresleni ctverce okolo mapy
+		g2.drawRect(0, 0, cWidth-250, cHeight-100);
+		
 		//vykreslení legendy
 		this.drawLegendaCRM(g2);	
 		
 		g2.setTransform(puvodniTR);
 		
 		
-		//Posun mapy, aby se zobrazovala celá uživateli  na plátně
+		//System.out.println(mapa.getMin().x + " "+ mapa.getMin().y);
+		//slouzi pro otoceni mapy
+		//g2.rotate(Math.toRadians(-90));
+		
+			
+		//Posun mapy, aby se zobrazovala celá uživateli na plátně
 		double posunX = -mapa.getMin().x;
 		double posunY = -mapa.getMin().y;	
-		g2.translate(posunX * mapa.getPomer(),posunY * mapa.getPomer());
+		g2.translate(posunX * mapa.getPomer(),posunY * mapa.getPomer()); //-mapa.getWidthMap()*mapa.getPomer()
+		
+
 		
 		//Vykreslen� mapy s vybran�m rokem
 		mapa.DrawMapa(g2, metoda, vychoziRok);

@@ -1,64 +1,57 @@
 package cz.zcu.sp;
 
 /**
- * Třída uchovávající informace o daném kraji pro jeden rok
- * @author Michal Proch�zka (A14B0339P) 
+ * Data class stores information about the county for one year
+ * @author Jan Novák & Marek Šimůnek 
  */
 public class Data {
 	
-	/** Udaj (opo�et obyvatel, kriminalita...) **/
-	private int udaj;
-	/** Rok pro udaj **/
-	private int rok;
+	/** Value **/
+	private double value;
+	
+	/** Year **/
+	private int year;
 	
 	/**
-	 * Vytvo�� objekt udaje
-	 * @param rok rok
-	 * @param udaj udaj/hodnota
+	 * Constructor for object Data
+	 * @param year year
+	 * @param value value
 	 */
-	public Data(int rok, int udaj)
+	public Data(int year, int value)
 	{
-		this.rok = rok;
-		this.udaj = udaj;
-	}
-
-	/**
-	 * Vrati udaj pro tento rok
-	 * @return udaj/hodnota
-	 */
-	public int Udaj()
-	{
-		return this.udaj;
+		this.year = year;
+		this.value = value;
 	}
 	
 	/**
-	 * Vrat� rok pro tento udaj
-	 * @return rok
+	 * Getter value
+	 * @return value
 	 */
-	public int Rok()
+	public double getValue()
 	{
-		return this.rok;
+		return this.value;
 	}
 	
 	/**
-	 * Vrati procentualn� hodnotu vzhledem k celkov� hodnot�
-	 * @param celkove hodnota
-	 * @return procentuln� hodnota
+	 * Getter year
+	 * @return year
 	 */
-	public double Procenta(int celkove)
+	public int getYear()
 	{
-		if(celkove == 0)
+		return this.year;
+	}
+	
+	/**
+	 * Method for adjust valu
+	 * @param value value
+	 * @return ajust value
+	 */
+	public double Procenta(double value)
+	{
+		if(value == 0)
 			return 0;
-			
-		return ((double)(this.udaj)*100.0)/((double)(celkove));
+		//TODO opraviv vzorec pri data ... nejspis typu 0-9,25 (napr.:1,24)	
+		return (((this.value)*100.0)/value);
 	}
 	
-	/**
-	 * Prida extra hodnotu k ji� vytvo�enemu udaji
-	 * @param data extra data
-	 */
-	public void Add(int data)
-	{
-		this.udaj += data;
-	}
 }

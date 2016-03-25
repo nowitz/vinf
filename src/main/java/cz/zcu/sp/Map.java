@@ -10,103 +10,85 @@ import java.util.ArrayList;
 
 
 /**
- * T��da s mapou �esk� republiky
- * @author Michal Proch�zka (A14B0339P) 
+ * Map class processes the input data and create object Map
+ * @author Jan Novák & Marek Šimůnek 
  */
 public class Map {
 
-	/** Vstupní soubor **/
-	private final String vstupniSouborOkresu = "data/kraje_cr.txt";
+	/** Input file with data map **/
+	private static final String INPUT_FILE_DATA_MAP = "data/kraje_cr.txt";
 	
-	/** N�zev vstupn�ho souboru pro statistiky**/
-	private final String vstupniPOP_WRK_CRM = "data/statistiky.txt";
+	/** Input file with data region **/
+	private static final String INPUT_FILE_DATA_REGION = "data/DoplnujiciInfo/";
 	
-	/** N�zev vstupn�ho souboru, kde jsou dal�� informace pro ka�d� okres zvl᚝ **/
-	private final String vstupniSouborInformaci = "data/DoplnujiciInfo/";
-	
-	/** ���ka vykreslovac�ho okna **/
-	private double widthVykres;
-	
-	/** V��ka vykreslovac�ho okna **/
-	private double heightVykres;
-	
-	/** ���ka mapy **/
+	/** width map **/
 	double widthMap = 0;
 	
-	/** V��ka mapy **/
+	/** height map **/
 	double heightMap = 0;
 	
-	/** Pom�r pro vykreslen�, aby se vykreslovan� prvek ve�el na pl�tno **/
-	double pomer = 0.0;
+	/** Ration for render map **/
+	double ratio = 0.0;
 	
-	/** Seznam okres� **/
-	ArrayList<Okres> regions;
+	/** List reions **/
+	ArrayList<Region> regions;
 	
-	/** Seznam s po�tem obyvatel �R pro ka�d� rok **/
-	ArrayList<Data> POPCelkem;
-	
-	/** Maximum mapy **/
+	/** Max map **/
 	Point2D.Double max;
 	
-	/** Minimum mapy **/
+	/** Min map **/
 	Point2D.Double min;
 	
-	/** Magická konstanta pro sirku CR **/
+	/** Magic constant for height map **/
 	public static final double MAGIC_CONSTANT = 1.3;
 
 
 	/**
-	 * Vytvo�en� mapy �esk� republiky a hodnoty pro jednotliv� okres
-	 * @param width ���ka vykreslovac�ho okna
-	 * @param height v��ka vykreslovac�ho okna
+	 * Constructor for create map with regions
+	 * @param width width canvas
+	 * @param height canvas
 	 */
-	public Map(double width, double height)
+	public Map(double widthCanvas, double heightCanvas)
 	{
-		this.widthVykres = width;
-		this.heightVykres = height;
-		this.regions = new ArrayList<Okres>();
-		this.POPCelkem = new ArrayList<Data>();
-			
-		readData(vstupniSouborOkresu);
+		this.regions = new ArrayList<Region>();
+		
+		readDataMap(INPUT_FILE_DATA_MAP);
 		
 		this.max = (Point2D.Double)regions.get(0).mapRegion.getMax().clone();
 		this.min = (Point2D.Double)regions.get(0).mapRegion.getMin().clone();
 
-		for (Okres okres : regions) {	
-			if (okres.mapRegion.getMin().x < min.x) min.x = okres.mapRegion.getMin().x;
-			if (okres.mapRegion.getMin().y < min.y) min.y = okres.mapRegion.getMin().y;
-			if (okres.mapRegion.getMax().x > max.x) max.x = okres.mapRegion.getMax().x;
-			if (okres.mapRegion.getMax().y > max.y) max.y = okres.mapRegion.getMax().y;
+		for (Region region : regions) {	
+			if (region.mapRegion.getMin().x < min.x) min.x = region.mapRegion.getMin().x;
+			if (region.mapRegion.getMin().y < min.y) min.y = region.mapRegion.getMin().y;
+			if (region.mapRegion.getMax().x > max.x) max.x = region.mapRegion.getMax().x;
+			if (region.mapRegion.getMax().y > max.y) max.y = region.mapRegion.getMax().y;
 		}
 		
-		//slouzi pro vypocitavani pomeru podle toho jak se ma roztahovat okno
+		//slouzi pro vypocitavani ratiou podle toho jak se ma roztahovat okno
 		widthMap = Math.abs(Math.abs(max.x) - Math.abs(min.x));
 		heightMap = Math.abs(Math.abs(max.y) - Math.abs(min.y));
 		
-		//Spo�ten� pom�ru pro vykreslov�n�
-		if(heightMap*(widthVykres/widthMap) < heightVykres)
-			pomer = widthVykres/widthMap;
+		//Spčtení poměru pro vykreslovací vlákno
+		if(heightMap*(widthCanvas/widthMap) < heightCanvas)
+			ratio = widthCanvas/widthMap;
 		else
-			pomer = heightVykres/heightMap;
+			ratio = heightCanvas/heightMap;
 	
-		///nacteni barev atd...
-		//this.readPOP_WRK_CRM(vstupniPOP_WRK_CRM);
+		//TODO doresit nacteni a obarvovani dat
+		//nacteni barev atd...
+		//this.readData(INPUT_FILE_DATA_REGION);
 		
-		for (int i = 2000; i <= 2013; i++) {
-			int celkem = 0;
-			for (Okres okres : regions) {
-				celkem += okres.getPOPUdaj(i);
+		for (Region region : regions) {
+				region.addData(new String[]{"1","2","3","4","5"});
 			}
-			POPCelkem.add(new Data(i, celkem));
-		}
 				
 	}
 	
 	/**
-	 * Slouzi pro otoceni vstupnich dat o -90°
+	 * Method for rotation input data about -90°
 	 * @param pointX
 	 * @param pointY
-	 * @return
+	 * @return rotation point
 	 */
 	public Point2D.Double rotationPoint(double pointX, double pointY){
 		double angle = -90 * Math.PI / 180;
@@ -122,10 +104,10 @@ public class Map {
 	}
 	
 	/**
-	 * �ten� dat pro vykreslen� mapy
-	 * @param path cesta k souboru
+	 * Method for obtaining data from a file to map
+	 * @param path url to file
 	 */
-	public void readData(String path) {
+	public void readDataMap(String path) {
 
 		BufferedReader br = null;
 		
@@ -147,16 +129,12 @@ public class Map {
 						points[i] = rotationPoint(Double.parseDouble(singlePoint[0])*MAGIC_CONSTANT,Double.parseDouble(singlePoint[1]));
 					}
 					
-					this.regions.add(
-							new Okres(
-							data[0].split(":")[1],
-							data[1].split(":")[1],  
-							points));
+					this.regions.add(new Region(data[0].split(":")[1],data[1].split(":")[1], points));
 				}				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("Soubor neni v predpokladanem formatu. Program bude ukoncen "+ sCurrentLine);
+				System.out.println("File is not in the anticipated format. The program will be terminated "+ sCurrentLine);
 				System.exit(1);
 			}
 			finally 
@@ -173,7 +151,7 @@ public class Map {
 		}
 		catch (Exception e) 
 		{
-			System.out.println("Soubor se nepodarilo precist. Program bude ukoncen");
+			System.out.println("The file could not be read. The program will be terminated.");
 			System.exit(1);
 		}
 		
@@ -181,10 +159,10 @@ public class Map {
 	}
 	
 	/**
-	 * �ten� dat a ulo�en� do jednotliv�ch okres�
-	 * @param path cesta k souboru
+	 * Method for obtaining data from a file to region
+	 * @param path url to file
 	 */
-	public void readPOP_WRK_CRM(String path) {
+	public void readData(String path) {
 
 		BufferedReader br = null;
 		
@@ -197,41 +175,27 @@ public class Map {
 		
 				while ((sCurrentLine = br.readLine()) != null) {
 
-					String nazev = sCurrentLine.trim();					
-					String pop = br.readLine().trim();
-					String wrk = br.readLine().trim();
-					String crm = br.readLine().trim();
+					String name = sCurrentLine.trim();					
+					String value = br.readLine().trim();
 					
-					
-					boolean zapsano = false;
-					for (Okres okres : regions) {
-						if(okres.nazev.toLowerCase().equals(nazev.toLowerCase()))
+					boolean entered = false;
+					for (Region region : regions) {
+						if(region.name.toLowerCase().equals(name.toLowerCase()))
 						{
-							String[] data = pop.split(";");
-							okres.AddPOP(data);
-							
-							data = wrk.split(";");
-							okres.AddWRK(data);
-							
-							data = crm.split(";");
-							okres.AddCRM(data);
-							
-							okres.ulozDalsiInfo(readDalsiInfo(nazev));
-							
-							zapsano = true;
-							
-							
+							String[] data = value.split(";");
+							region.addData(data);										
+							entered = true;			
 							break;
 						}
 					}
 					
-					if(!zapsano)
-						System.out.println("Chyba zaps�n� m�sta:"+nazev);					
+					if(!entered)
+						System.out.println("Error writing region:"+name);					
 				}				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("Soubor neni v predpokladanem formatu. Program bude ukoncen "+ sCurrentLine);
+				System.out.println("File is not in the anticipated format. The program will be terminated "+ sCurrentLine);
 				System.exit(1);
 			}
 			finally 
@@ -248,137 +212,69 @@ public class Map {
 		}
 		catch (Exception e) 
 		{
-			System.out.println("Soubor se nepodarilo precist. Program bude ukoncen");
+			System.out.println("The file could not be read. The program will be terminated.");
 			System.exit(1);
 		}
 		
 	}
-	
+		
 	/**
-	 * �ten� dal��ch informaci pro dan� okres
-	 * @param nazevSouboruInformaci n�zev souboru 
-	 * @return seznam s informacemi
+	 * Depict map
+	 * @param g2 Graphics2D
+	 * @param method method what to render (by the method - the color scale)
+	 * @param year current year
 	 */
-	public ArrayList<String> readDalsiInfo(String nazevSouboruInformaci) {
-
-		ArrayList<String> dalsiInfo = new ArrayList<String>();
-		BufferedReader brinfo = null;
-		
-		try {
-			
-			String sCurrentLine = "";
-			brinfo = new BufferedReader( new InputStreamReader(new FileInputStream(vstupniSouborInformaci+nazevSouboruInformaci+".txt")));
-			
-			try {
-		
-				while ((sCurrentLine = brinfo.readLine()) != null) {
-					dalsiInfo.add(sCurrentLine);					
-				}				
-			}
-			catch (Exception e) {
-				//System.out.println("Soubor neni v predpokladanem formatu. Program bude ukoncen "+ sCurrentLine);
-			}
-			finally 
-			{
-				try 
-				{
-					if (brinfo != null)brinfo.close();
-				} 
-				catch (Exception ex) 
-				{
-				}
-			}
+	public void DrawMapa (Graphics2D g2, String method, int year)
+	{
+		System.out.println("MAP: " + method +" - " + year);
+	
+		for (Region region : regions) {
+			region.DrawRegion(g2, ratio, method, year);
 		}
-		catch (Exception e) 
-		{
-			//System.out.println("Soubor se nepodarilo precist nebo neexistuje.");
-		}
-		
-		return dalsiInfo;
-		
 	}
 	
 	/**
-	 * Vykresl� panel s informacemi
+	 * Depict highlight region
 	 * @param g2 Graphics2D
-	 * @param rok vybran� rok
-	 * @param sirkaInfoPanelu ���ka panelu s informacemi
-	 * @param velikostNadpisu velikost p�sma pro nadpis
-	 * @param velikostPisma velikost ostan�ho p�sma
-	 * @param vyberMesta vybrn� m�sto pro kter� se maj� informace vykreslit
-	 * @param metoda metoda vizualizace
+	 * @param selectRegion select region for highlight
 	 */
-	public void DrawInfo(Graphics2D g2, int rok, int sirkaInfoPanelu, int velikostNadpisu, int velikostPisma, String vyberMesta, String metoda)
+	public void DrawThisRegion(Graphics2D g2, String selectRegion)
 	{
-		for (Okres okres : regions) {
-			if(okres.zkratka.equals(vyberMesta))
+		for (Region region : regions) {
+			if(region.shortName.equals(selectRegion))
 			{
-				okres.drawInfo(g2, rok, sirkaInfoPanelu, velikostNadpisu, velikostPisma, metoda, POPCelkem);
+				region.DrawThisRegion(g2, ratio);
 				break;
 			}
 		}
 	}
 	
 	/**
-	 * Vykreslen� mapy
-	 * @param g2 Graphics2D
-	 * @param metoda metoda co se m� vykreslovat (podle metody - barevn� �k�la)
-	 * @param rok vybran� rok
-	 */
-	public void DrawMapa (Graphics2D g2, String metoda, int rok)
-	{
-		int celkem  = 0;
-		for (Data udaje : POPCelkem) {
-			if(udaje.Rok() == rok)
-				celkem = udaje.Udaj();
-		}
-		
-		for (Okres okres : regions) {
-			okres.DrawRegion(g2, pomer, metoda, rok, celkem);
-		}
-	}
-	
-	/**
-	 * Vykresl� zv�razn�n� okres
-	 * @param g2 Graphics2D
-	 * @param vyberMesta vybran� m�sto pro zv�razn�n�
-	 */
-	public void DrawThisRegion(Graphics2D g2, String vyberMesta)
-	{
-		for (Okres okres : regions) {
-			if(okres.zkratka.equals(vyberMesta))
-			{
-				okres.DrawThisRegion(g2, pomer);
-				break;
-			}
-		}
-	}
-	
-	/**
-	 * Vr�t� n�zev m�sta pokud bude na n�j kliknut, jinak vr�t� hodnotu Plze�-m�sto
-	 * @param point sou�adnice kliknut� my�i
-	 * @return název města
+	 * Method for return name region after click
+	 * @param point coordinate click
+	 * @return name region
 	 */
 	public String isInArea(Point point)
 	{
-		String vyberMesta = "";
-		//TODO pokud okres == PRH tak konkroluj 1. protoze jinak to najde stredocesky kraj
+		String selectRegion = "";
+		//TODO pokud region == PRH tak konkroluj 1. protoze jinak to najde stredocesky kraj
 		if("PRH".contentEquals(regions.get(12).isInArea(point))){
 			return "PRH";
 		}else{
-			for (Okres okres : regions) {
-				vyberMesta = okres.isInArea(point);
+			for (Region region : regions) {
+				selectRegion = region.isInArea(point);
 				
-				if(vyberMesta != "")
-					return vyberMesta;
+				if(selectRegion != "")
+					return selectRegion;
 			}
 		}	
-		return "PM";
+		return "PRH";
 	}
 	
+	
 	/**
-	 * Maximum mapy
-	 * @return maximum mapy
+	 * Getter max map
+	 * @return max map
 	 */
 	public Point2D.Double getMax()
 	{
@@ -386,8 +282,8 @@ public class Map {
 	}
 	
 	/**
-	 * Minimum mapy
-	 * @return minimum mapy
+	 * Getter min map
+	 * @return min map
 	 */
 	public Point2D.Double getMin()
 	{
@@ -395,17 +291,17 @@ public class Map {
 	}	
 	
 	/**
-	 * Pom�r vykreslen�
-	 * @return pom�r vykreslen�
+	 * Getter ratio render
+	 * @return ratio render
 	 */
-	public double getPomer()
+	public double getRatio()
 	{
-		return this.pomer;
+		return this.ratio;
 	}
 		
 	/**
-	 * ���ka mapy
-	 * @return ���ka mapy
+	 * Getter widht map
+	 * @return width map
 	 */
 	public double getWidthMap()
 	{
@@ -413,25 +309,12 @@ public class Map {
 	}
 	
 	/**
-	 * Velikost mapy
-	 * @return velikost mapy
+	 * Getter heigh map
+	 * @return heigh map
 	 */
 	public double getHeightMap()
 	{
 		return this.heightMap;
-	}
-
-	/**
-	 * Nastav� dal�� infro pro vykreslen�
-	 */
-	public void dalsiInfo(String vyberMesta)
-	{
-		for (Okres okres : regions) {
-			if(okres.zkratka.equals(vyberMesta))
-			{
-				okres.dalsiInfo();
-			}
-		}
 	}
 	
 }

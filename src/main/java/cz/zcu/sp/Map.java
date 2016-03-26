@@ -77,10 +77,10 @@ public class Map {
 		//TODO doresit nacteni a obarvovani dat
 		//nacteni barev atd...
 		//this.readData(INPUT_FILE_DATA_REGION);
-		
+		//to tu pak nebude....
 		for (Region region : regions) {
-				region.addData(new String[]{"1","2","3","4","5"});
-			}
+			region.addData(new String[]{"1","2","3","4","5"});
+		}
 				
 	}
 	
@@ -221,15 +221,15 @@ public class Map {
 	/**
 	 * Depict map
 	 * @param g2 Graphics2D
-	 * @param method method what to render (by the method - the color scale)
+	 * @param methodTypeDataTypeData methodTypeDataTypeData what to render (by the methodTypeDataTypeData - the color scale)
 	 * @param year current year
 	 */
-	public void DrawMapa (Graphics2D g2, String method, int year)
+	public void DrawMapa (Graphics2D g2, String methodTypeDataTypeData, int year)
 	{
-		System.out.println("MAP: " + method +" - " + year);
+		System.out.println("MAP: " + methodTypeDataTypeData +" - " + year);
 	
 		for (Region region : regions) {
-			region.DrawRegion(g2, ratio, method, year);
+			region.DrawRegion(g2, ratio, methodTypeDataTypeData, year);
 		}
 	}
 	
@@ -254,21 +254,21 @@ public class Map {
 	 * @param point coordinate click
 	 * @return name region
 	 */
-	public String isInArea(Point point)
+	public Region isInArea(Point point)
 	{
 		String selectRegion = "";
 		//TODO pokud region == PRH tak konkroluj 1. protoze jinak to najde stredocesky kraj
 		if("PRH".contentEquals(regions.get(12).isInArea(point))){
-			return "PRH";
+			return regions.get(12);
 		}else{
 			for (Region region : regions) {
 				selectRegion = region.isInArea(point);
 				
 				if(selectRegion != "")
-					return selectRegion;
+					return region;
 			}
 		}	
-		return "PRH";
+		return regions.get(12);
 	}
 	
 	

@@ -15,7 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 /**
- * Tato t��da byla vytvo�ena ji� pro cvi�en�, z mal� ��sti byla tato t��da upravena pro pot�eby SP. Resp. bylo p�id�no mal� mno�stv� ��dk� k�du
+ * Tato třída byla vytvořena již pro cvičení, z malé části byla tato třída upravena pro potřeby SP. Resp. bylo přidáno malé množství řádků kódu
  * @author ZCU/KIV/UPG
  *
  */
@@ -141,13 +141,7 @@ public class MapRegion {
 		if (!k.contains(r)) {
 			
 			labelLayout.draw(g2, (float)(centroidTransformed.x),(float)( centroidTransformed.y));
-			//
-			//
-			//
-			//�e�en�ch je mnoho, dod�lat pokud bude �as...
-			//
-			//
-			//
+			//zlepsit vypis
 		}
 		else
 			labelLayout.draw(g2, (float)(centroidTransformed.x),(float)( centroidTransformed.y));

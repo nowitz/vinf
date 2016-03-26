@@ -2,11 +2,17 @@ package cz.zcu.sp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.TextComponent;
+import java.awt.event.MouseEvent;
+import java.awt.font.TextLayout;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 /**
  * Graphic components class for application (frame, button, etc.)
@@ -114,6 +120,38 @@ public class GraphicComponents extends JPanel{
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Method for create modal window
+	 * @param select
+	 */
+	public static void showModalWindow(Region select){
+		JFrame modal = new JFrame(select.name);
+		//modal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		modal.setLayout(new BorderLayout());
+		
+		modal.add(detailRegion(select), BorderLayout.CENTER);
+		
+		modal.pack();
+		modal.setSize(300, 300);
+
+		modal.setMinimumSize(new Dimension(300, 300));
+
+		modal.setLocationRelativeTo(null);
+		modal.setVisible(true);
+	}
+	
+	
+	private static JPanel detailRegion(Region select){
+		JPanel borderPanel = new JPanel();
+		JTextArea textArea = new JTextArea(select.dataList.get(2).getValue()+"");
+			textArea.setFont(new Font("Serif", Font.ITALIC, 16));
+			textArea.setLineWrap(true);
+			textArea.setWrapStyleWord(true);
+		
+		borderPanel.add(textArea);
+		return borderPanel;
+		
+	}
 	
 
 }

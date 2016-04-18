@@ -124,12 +124,12 @@ public class GraphicComponents extends JPanel{
 	 * Method for create modal window
 	 * @param select
 	 */
-	public static void showModalWindow(Region select){
+	public static void showModalWindow(Region select, int currentYear){
 		JFrame modal = new JFrame(select.name);
 		//modal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		modal.setLayout(new BorderLayout());
 		
-		modal.add(detailRegion(select), BorderLayout.CENTER);
+		modal.add(detailRegion(select, currentYear), BorderLayout.CENTER);
 		
 		modal.pack();
 		modal.setSize(300, 300);
@@ -141,12 +141,13 @@ public class GraphicComponents extends JPanel{
 	}
 	
 	
-	private static JPanel detailRegion(Region select){
+	private static JPanel detailRegion(Region select, int currentYear){
 		JPanel borderPanel = new JPanel();
 		JTextArea textArea = new JTextArea(select.dataList.get(2).getValue()+"");
 			textArea.setFont(new Font("Serif", Font.ITALIC, 16));
 			textArea.setLineWrap(true);
 			textArea.setWrapStyleWord(true);
+			System.out.println("rok: "+currentYear);
 		
 		borderPanel.add(textArea);
 		return borderPanel;

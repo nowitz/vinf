@@ -83,7 +83,7 @@ public class DrawingWindow extends JPanel {
 					if (e.getClickCount() >= 2) {
 						// TODO modální okno s informace o kraji - budu si
 						// vracet celej objekt regionu
-						GraphicComponents.showModalWindow(select);
+						GraphicComponents.showModalWindow(select, currentYear);
 
 					}
 				}
